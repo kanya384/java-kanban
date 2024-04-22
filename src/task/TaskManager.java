@@ -10,11 +10,7 @@ public class TaskManager {
     private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
 
     public ArrayList<Task> getTasks() {
-        ArrayList<Task> tasksList = new ArrayList<>();
-        for (Integer id : tasks.keySet()) {
-            tasksList.add(tasks.get(id));
-        }
-        return  tasksList;
+        return  new ArrayList<>(tasks.values());
     }
 
     public ArrayList<SubTask> getSubTasks() {
