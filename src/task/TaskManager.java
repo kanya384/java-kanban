@@ -18,19 +18,11 @@ public class TaskManager {
     }
 
     public ArrayList<SubTask> getSubTasks() {
-        ArrayList<SubTask> subTasksList = new ArrayList<>();
-        for (Integer id : subTasks.keySet()) {
-            subTasksList.add(subTasks.get(id));
-        }
-        return  subTasksList;
+        return new ArrayList<>(subTasks.values());
     }
 
     public ArrayList<Epic> getEpics() {
-        ArrayList<Epic> epicsList = new ArrayList<>();
-        for (Integer id : epics.keySet()) {
-            epicsList.add(epics.get(id));
-        }
-        return  epicsList;
+        return new ArrayList<>(epics.values());
     }
 
     public void clearTasks() {
@@ -48,6 +40,7 @@ public class TaskManager {
 
     public void clearEpics() {
         epics.clear();
+        subTasks.clear();
     }
 
     public Task getTaskById(int id) {
