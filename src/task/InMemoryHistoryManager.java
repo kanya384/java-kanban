@@ -8,7 +8,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (showedTasksHistory.size() == 10) {
-            showedTasksHistory.remove(1);
+            showedTasksHistory.removeFirst();
         }
 
         if (task instanceof Epic) {

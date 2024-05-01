@@ -1,13 +1,13 @@
 package task;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class InMemoryTaskManagerTest {
     private static TaskManager taskManager;
@@ -31,7 +31,7 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+        assertEquals(task, tasks.getFirst(), "Задачи не совпадают.");
     }
 
     @Test
@@ -48,7 +48,7 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(epics, "Задачи не возвращаются.");
         assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(epic, epics.get(0), "Задачи не совпадают.");
+        assertEquals(epic, epics.getFirst(), "Задачи не совпадают.");
     }
 
     @Test
@@ -68,7 +68,7 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(subTasks, "Задачи не возвращаются.");
         assertEquals(1, subTasks.size(), "Неверное количество задач.");
-        assertEquals(subTask, subTasks.get(0), "Задачи не совпадают.");
+        assertEquals(subTask, subTasks.getFirst(), "Задачи не совпадают.");
     }
 
     @Test
