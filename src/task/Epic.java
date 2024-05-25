@@ -2,8 +2,9 @@ package task;
 
 import java.util.ArrayList;
 
-public class Epic extends Task{
+public class Epic extends Task {
     private final ArrayList<Integer> subTaskIds;
+
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
         subTaskIds = new ArrayList<>();
