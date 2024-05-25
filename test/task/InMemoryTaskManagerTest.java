@@ -149,4 +149,18 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertArrayEquals(subTasksBeforeUpdate.toArray(), subTasksAfterUpdate.toArray());
     }
+
+    @Test
+    void shouldNotEpicContainRemovedTaskId() {
+        Epic epic = new Epic("test", "test");
+        taskManager.createEpic(epic);
+
+        SubTask subTask = new SubTask("test", "test", Status.NEW, 1);
+        taskManager.createSubTask(subTask);
+
+        taskManager.deleteSubTaskById(subTask.getId());
+
+        ArrayList<Integer> subTasksList = taskManager.getEpicById(epic.getId()).getSubTaskIds();
+        Assertions.assertEquals(subTasksList.size(), 0);
+    }
 }

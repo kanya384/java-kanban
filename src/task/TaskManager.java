@@ -1,6 +1,7 @@
 package task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     ArrayList<Task> getTasks();
@@ -29,5 +30,5 @@ public interface TaskManager {
     void deleteSubTaskById(int id);
     void deleteEpicById(int epicId);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }

@@ -8,18 +8,41 @@ public class Main {
         Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW);
         taskManager.createTask(task);
 
+        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW);
+        taskManager.createTask(task2);
+
         Epic epic = new Epic("Перезд", "Собрать вещи для переезда");
         taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("Нанести пену и смыть водой", "Нанести пену и смыть водой", Status.NEW, epic.getId());
+        SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, epic.getId());
         taskManager.createSubTask(subTask);
+
+        SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, epic.getId());
+        taskManager.createSubTask(subTask2);
+
+        SubTask subTask3 = new SubTask("Смыть пену", "Смыть пену", Status.NEW, epic.getId());
+        taskManager.createSubTask(subTask3);
 
 
         taskManager.getEpicById(epic.getId());
         taskManager.getSubTaskById(subTask.getId());
         taskManager.getTaskById(task.getId());
 
-        printAllTasks(taskManager);
+        System.out.println(taskManager.getHistory());
+
+        taskManager.getSubTaskById(subTask.getId());
+        taskManager.getTaskById(task.getId());
+        taskManager.getEpicById(epic.getId());
+
+        System.out.println(taskManager.getHistory());
+
+        taskManager.deleteTaskById(task.getId());
+
+        System.out.println(taskManager.getHistory());
+
+        taskManager.deleteEpicById(epic.getId());
+        System.out.println(taskManager.getHistory());
+
     }
 
     private static void printAllTasks(TaskManager manager) {

@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class InMemoryHistoryManagerTest {
 
@@ -16,81 +19,136 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void shouldStorePreviousVersionsOfTask() {
-        int originalId = 1;
-        String originalName = "test";
-        String originalDescription = "test description";
-        Status originalStatus = Status.NEW;
+    void shouldReplacePreviousVersionsOfTask() {
 
-        Task task = new Task(originalName, originalDescription, originalStatus);
-        task.setId(originalId);
+        Task task = new Task("test", "test description", Status.NEW);
+        task.setId(1);
 
         inMemoryHistoryManager.add(task);
 
-        task.setName("new");
-        task.setDescription("new");
+
+        task.setName("test updated");
+        task.setDescription("description updated");
 
         inMemoryHistoryManager.add(task);
 
-        ArrayList<Task> history = inMemoryHistoryManager.getHistory();
+        List<Task> history = inMemoryHistoryManager.getHistory();
 
-        Assertions.assertEquals(2, history.size());
+        assertEquals(1, history.size());
 
-        Assertions.assertEquals(history.getFirst().getId(), originalId);
-        Assertions.assertEquals(history.getFirst().getName(), originalName);
-        Assertions.assertEquals(history.getFirst().getDescription(), originalDescription);
-        Assertions.assertEquals(history.getFirst().getStatus(), originalStatus);
+        assertEquals(history.getFirst(), task);
     }
 
     @Test
-    void shouldStorePreviousVersionsOfEpic() {
+    void shouldReplacePreviousVersionsOfEpic() {
 
-        int originalId = 1;
-        String originalName = "test";
-        String originalDescription = "test description";
-
-        Epic epic = new Epic(originalName, originalDescription);
-        epic.setId(originalId);
+        Epic epic = new Epic("test", "test description");
+        epic.setId(1);
 
         inMemoryHistoryManager.add(epic);
 
-        epic.setName("new");
-        epic.setDescription("new");
+        epic.setName("test updated");
+        epic.setDescription("description updated");
 
         inMemoryHistoryManager.add(epic);
 
-        ArrayList<Task> history = inMemoryHistoryManager.getHistory();
+        List<Task> history = inMemoryHistoryManager.getHistory();
 
-        Assertions.assertEquals(2, history.size());
+        Assertions.assertEquals(1, history.size());
 
-        Assertions.assertEquals(history.getFirst().getId(), originalId);
-        Assertions.assertEquals(history.getFirst().getName(), originalName);
-        Assertions.assertEquals(history.getFirst().getDescription(), originalDescription);
+        assertEquals(history.getFirst(), epic);
     }
 
     @Test
-    void shouldStorePreviousVersionsOfSubTask() {
+    void shouldReplacePreviousVersionsOfSubTask() {
 
-        int originalId = 1;
-        String originalName = "test";
-        String originalDescription = "test description";
-
-        SubTask subTask = new SubTask(originalName, originalDescription, Status.NEW, 1);
-        subTask.setId(originalId);
+        SubTask subTask = new SubTask("test", "test description", Status.NEW, 1);
+        subTask.setId(1);
 
         inMemoryHistoryManager.add(subTask);
 
-        subTask.setName("new");
-        subTask.setDescription("new");
+        subTask.setName("new name");
+        subTask.setDescription("new description");
 
         inMemoryHistoryManager.add(subTask);
 
-        ArrayList<Task> history = inMemoryHistoryManager.getHistory();
+        List<Task> history = inMemoryHistoryManager.getHistory();
 
-        Assertions.assertEquals(2, history.size());
+        assertEquals(1, history.size());
 
-        Assertions.assertEquals(history.getFirst().getId(), originalId);
-        Assertions.assertEquals(history.getFirst().getName(), originalName);
-        Assertions.assertEquals(history.getFirst().getDescription(), originalDescription);
+        assertEquals(history.getFirst(), subTask);
     }
+
+    @Test
+    void shouldAddTasksInRightOrder() {
+        Task task = new Task("test", "test description", Status.NEW);
+        task.setId(1);
+
+        inMemoryHistoryManager.add(task);
+
+        Task task2 = new Task("test", "test description", Status.NEW);
+        task2.setId(2);
+
+        inMemoryHistoryManager.add(task2);
+
+        Task task3 = new Task("test", "test description", Status.NEW);
+        task3.setId(3);
+
+        inMemoryHistoryManager.add(task3);
+
+        List<Task> history = inMemoryHistoryManager.getHistory();
+
+        for (int i = 0; i < history.size(); i++) {
+            assertEquals(i+1, history.get(i).getId());
+        }
+    }
+
+    @Test
+    void shouldRemoveTaskById() {
+
+        Task task = new Task("test", "test description", Status.NEW);
+        task.setId(1);
+
+        inMemoryHistoryManager.add(task);
+
+        Task task2 = new Task("test", "test description", Status.NEW);
+        task2.setId(2);
+
+        inMemoryHistoryManager.add(task2);
+
+        Task task3 = new Task("test", "test description", Status.NEW);
+        task3.setId(3);
+
+        inMemoryHistoryManager.add(task3);
+
+        List<Task> history = inMemoryHistoryManager.getHistory();
+
+        assertEquals(3, history.size());
+
+        inMemoryHistoryManager.remove(task2.getId());
+
+        history = inMemoryHistoryManager.getHistory();
+
+        assertEquals(2, history.size());
+
+        for (Task historyItem : history) {
+            assertNotEquals(task2, historyItem);
+        };
+    }
+
+    @Test
+    void shouldBeEmptyAfterRemoveIfSingleTask() {
+
+        Task task = new Task("test", "test description", Status.NEW);
+        task.setId(1);
+
+        inMemoryHistoryManager.add(task);
+
+        inMemoryHistoryManager.remove(task.getId());
+
+        List<Task> history = inMemoryHistoryManager.getHistory();
+
+        assertEquals(0, history.size());
+    }
+
 }
