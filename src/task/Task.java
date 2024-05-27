@@ -25,20 +25,23 @@ public class Task {
     public int getId() {
         return id;
     }
-    public void setId(int id) {
+
+    protected void setId(int id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
+
     public String getName() {
         return name;
     }
 
-    public void setDescription(String description) {
+    protected void setDescription(String description) {
         this.description = description;
     }
+
     public String getDescription() {
         return description;
     }
