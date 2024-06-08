@@ -127,7 +127,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
 
             for (String line : lines) {
-                if (line.equals(title)) {
+                if (line.equals(title) || line.isBlank()) {
                     continue;
                 }
 
