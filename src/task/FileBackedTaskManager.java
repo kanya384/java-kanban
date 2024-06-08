@@ -6,41 +6,133 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    private final String outputFile;
+    private final File outputFile;
+    private static final String title = "id,type,name,status,description,epic";
 
-    FileBackedTaskManager(String outputFile) {
+    FileBackedTaskManager(File outputFile) {
         this.outputFile = outputFile;
+        save();
     }
 
-    private void save() {
-        try (FileWriter writer = new FileWriter(outputFile)) {
-            writer.write("id,type,name,status,description,epic");
+    public static void main(String[] args) {
 
-            for (Task task : tasks.values()) {
-                writer.write(toString(task));
-            }
+        File tmpFile = new File("tasks.csv");
 
-            for (Epic epic : epics.values()) {
-                writer.write(toString(epic));
-            }
+        FileBackedTaskManager taskManager1 = new FileBackedTaskManager(tmpFile);
+        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW);
+        taskManager1.createTask(task);
 
-            for (SubTask subTask : subTasks.values()) {
-                writer.write(toString(subTask));
-            }
+        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW);
+        taskManager1.createTask(task2);
 
-        } catch (IOException e) {
-            throw new ManagerSaveException(e);
+        Epic epic = new Epic("Перезд", "Собрать вещи для переезда");
+        taskManager1.createEpic(epic);
+
+        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(tmpFile);
+
+        if (taskManager1.getTasks().size() != taskManager2.getTasks().size()) {
+            System.out.println("tasks sizes are not equal");
         }
+
+        if (taskManager1.getSubTasks().size() != taskManager2.getSubTasks().size()) {
+            System.out.println("subtasks sizes are not equal");
+        }
+
+        if (taskManager1.getEpics().size() != taskManager2.getEpics().size()) {
+            System.out.println("epics sizes are not equal");
+        }
+
+
+    }
+
+    @Override
+    public void clearTasks() {
+        super.clearTasks();
+        save();
+    }
+
+    @Override
+    public void clearSubTasks() {
+        super.clearSubTasks();
+        save();
+    }
+
+    @Override
+    public void clearEpics() {
+        super.clearEpics();
+        save();
+    }
+
+    @Override
+    public int createTask(Task task) {
+        int taskId = super.createTask(task);
+        save();
+        return taskId;
+    }
+
+    @Override
+    public int createSubTask(SubTask subTask) {
+        int subTaskId = super.createSubTask(subTask);
+        save();
+        return subTaskId;
+    }
+
+    @Override
+    public int createEpic(Epic epic) {
+        int epicId = super.createEpic(epic);
+        save();
+        return epicId;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void updateSubTask(SubTask subTask) {
+        super.updateSubTask(subTask);
+        save();
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void deleteTaskById(int id) {
+        super.deleteTaskById(id);
+        save();
+    }
+
+    @Override
+    public void deleteSubTaskById(int id) {
+        super.deleteSubTaskById(id);
+        save();
+    }
+
+    @Override
+    public void deleteEpicById(int epicId) {
+        super.deleteEpicById(epicId);
+        save();
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
         try {
-            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file.getPath());
             String[] lines = Files.readString(file.toPath()).split("\n");
+            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+
 
             for (String line : lines) {
+                if (line.equals(title)) {
+                    continue;
+                }
+
                 Task task = fromString(line);
-                TaskType taskType = TaskType.valueOf(task.getClass().getName().toUpperCase());
+                TaskType taskType = toEnum(task);
                 switch (taskType) {
                     case TASK -> fileBackedTaskManager.createTask(task);
 
@@ -58,26 +150,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    private String toString(Task task) {
-        TaskType taskType = TaskType.valueOf(task.getClass().getName().toUpperCase());
-        switch (taskType) {
+    private void save() {
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.write(title);
 
-            case TaskType.EPIC, TaskType.TASK -> {
-                return String.format("%d,%s,%s,%s,%s,", task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription());
+            for (Task task : tasks.values()) {
+                writer.write(String.format("\n%s", toString(task)));
             }
 
-            case TaskType.SUBTASK -> {
-                SubTask subTask = (SubTask) task;
-                return String.format("%d,%s,%s,%s,%s,%d", subTask.getId(), taskType, subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicId());
+            for (Epic epic : epics.values()) {
+                writer.write(String.format("\n%s", toString(epic)));
             }
 
-            default -> {
-                throw new IllegalStateException("Unexpected value: " + taskType);
+            for (SubTask subTask : subTasks.values()) {
+                writer.write(String.format("\n%s", toString(subTask)));
             }
+
+        } catch (IOException e) {
+            throw new ManagerSaveException(e);
         }
     }
 
-    static Task fromString(String value) {
+    private static Task fromString(String value) {
         String[] items = value.split(",");
 
         TaskType taskType = TaskType.valueOf(items[1]);
@@ -112,6 +206,33 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
+    private String toString(Task task) {
+        TaskType taskType = toEnum(task); //.toUpperCase()
+        switch (taskType) {
+
+            case TaskType.EPIC, TaskType.TASK -> {
+                return String.format("%d,%s,%s,%s,%s,", task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription());
+            }
+
+            case TaskType.SUBTASK -> {
+                SubTask subTask = (SubTask) task;
+                return String.format("%d,%s,%s,%s,%s,%d", subTask.getId(), taskType, subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicId());
+            }
+        }
+
+        throw new IllegalStateException("Unexpected value: " + taskType);
+    }
+
+    private static TaskType toEnum(Task task) {
+        if (task instanceof SubTask) {
+            return TaskType.SUBTASK;
+        } else if (task instanceof Epic) {
+            return TaskType.EPIC;
+        }
+
+        return TaskType.TASK;
+    }
+
     static private Status stringToStatus(String input) {
         Status status = Status.valueOf(input);
 
@@ -125,5 +246,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
         }
     }
+
 
 }

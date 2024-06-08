@@ -30,18 +30,18 @@ public class Main {
 
         System.out.println(taskManager.getHistory());
 
-        taskManager.getSubTaskById(subTask.getId());
-        taskManager.getTaskById(task.getId());
-        taskManager.getEpicById(epic.getId());
 
-        System.out.println(taskManager.getHistory());
 
-        taskManager.deleteTaskById(task.getId());
 
-        System.out.println(taskManager.getHistory());
+        /*
+        //load from file
+        TaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("./tasks.csv"));
 
-        taskManager.deleteEpicById(epic.getId());
-        System.out.println(taskManager.getHistory());
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubTasks());
+         */
+
 
     }
 
