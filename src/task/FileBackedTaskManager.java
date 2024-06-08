@@ -233,7 +233,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return TaskType.TASK;
     }
 
-    static private Status stringToStatus(String input) {
+    private static Status stringToStatus(String input) {
         Status status = Status.valueOf(input);
 
         switch (status) {
