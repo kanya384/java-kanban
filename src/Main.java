@@ -30,18 +30,6 @@ public class Main {
 
         System.out.println(taskManager.getHistory());
 
-        taskManager.getSubTaskById(subTask.getId());
-        taskManager.getTaskById(task.getId());
-        taskManager.getEpicById(epic.getId());
-
-        System.out.println(taskManager.getHistory());
-
-        taskManager.deleteTaskById(task.getId());
-
-        System.out.println(taskManager.getHistory());
-
-        taskManager.deleteEpicById(epic.getId());
-        System.out.println(taskManager.getHistory());
 
     }
 
