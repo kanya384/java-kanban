@@ -30,7 +30,6 @@ public class Main {
 
         System.out.println(taskManager.getHistory());
 
-
     }
 
     private static void printAllTasks(TaskManager manager) {
