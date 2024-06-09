@@ -131,7 +131,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     continue;
                 }
 
-                Task task = fromString(line);
+                Task task = convertStringToTask(line);
                 TaskType taskType = toEnum(task);
                 switch (taskType) {
                     case TASK -> fileBackedTaskManager.createTask(task);
@@ -155,15 +155,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             writer.write(title);
 
             for (Task task : tasks.values()) {
-                writer.write(String.format("\n%s", toString(task)));
+                writer.write(String.format("\n%s", convertTaskToString(task)));
             }
 
             for (Epic epic : epics.values()) {
-                writer.write(String.format("\n%s", toString(epic)));
+                writer.write(String.format("\n%s", convertTaskToString(epic)));
             }
 
             for (SubTask subTask : subTasks.values()) {
-                writer.write(String.format("\n%s", toString(subTask)));
+                writer.write(String.format("\n%s", convertTaskToString(subTask)));
             }
 
         } catch (IOException e) {
@@ -171,7 +171,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    private static Task fromString(String value) {
+    private static Task convertStringToTask(String value) {
         String[] items = value.split(",");
 
         TaskType taskType = TaskType.valueOf(items[1]);
@@ -206,8 +206,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    private String toString(Task task) {
-        TaskType taskType = toEnum(task); //.toUpperCase()
+    private String convertTaskToString(Task task) {
+        TaskType taskType = toEnum(task);
         switch (taskType) {
 
             case TaskType.EPIC, TaskType.TASK -> {
