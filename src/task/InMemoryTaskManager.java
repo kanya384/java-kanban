@@ -88,6 +88,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createTask(Task task) {
+        if (isIntersectsExistingTask(task)) {
+            return -1;
+        }
+
         int id = ++counter;
         task.setId(id);
         tasks.put(task.getId(), task);
@@ -98,6 +102,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createSubTask(SubTask subTask) {
+        if (isIntersectsExistingTask(subTask)) {
+            return -1;
+        }
+
         int id = ++counter;
         subTask.setId(id);
         subTasks.put(subTask.getId(), subTask);
@@ -255,7 +263,20 @@ public class InMemoryTaskManager implements TaskManager {
             }
             prioritizedTasks.add(epic);
         }
-        
+
+    }
+
+    private boolean isIntersectsExistingTask(Task input) {
+        List<Task> intersectedTasks = prioritizedTasks.stream()
+                .filter((task) -> isIntersectedTasks(input, task))
+                .toList();
+        return !intersectedTasks.isEmpty();
+    }
+
+    private boolean isIntersectedTasks(Task task1, Task task2) {
+        return ((task1.getStartTime().isAfter(task2.getStartTime()) && task1.getEndTime().isBefore(task2.getEndTime()))
+                || (task2.getStartTime().isAfter(task1.getStartTime()) && task2.getEndTime().isBefore(task1.getEndTime()))
+                || (task2.getStartTime().isEqual(task1.getStartTime()) || task2.getEndTime().isEqual(task1.getEndTime())));
     }
 
 }

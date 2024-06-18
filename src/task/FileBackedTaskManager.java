@@ -28,7 +28,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         taskManager1.createTask(task);
 
         Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
-        taskManager1.createTask(task2);
+        System.out.println(taskManager1.createTask(task2));
 
         Epic epic = new Epic("Помыть машину", "Помыть машину перед выходными");
         taskManager1.createEpic(epic);
