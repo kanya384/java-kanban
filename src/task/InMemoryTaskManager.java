@@ -235,9 +235,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void updatePrioritizedTasks() {
         prioritizedTasks.clear();
-        prioritizedTasks.addAll(tasks.values());
-        prioritizedTasks.addAll(subTasks.values());
-        prioritizedTasks.addAll(epics.values());
+        for (Task task : tasks.values()) {
+            if (task.getStartTime() == null) {
+                continue;
+            }
+            prioritizedTasks.add(task);
+        }
+
+        for (SubTask subTask : subTasks.values()) {
+            if (subTask.getStartTime() == null) {
+                continue;
+            }
+            prioritizedTasks.add(subTask);
+        }
+
+        for (Epic epic : epics.values()) {
+            if (epic.getStartTime() == null) {
+                continue;
+            }
+            prioritizedTasks.add(epic);
+        }
+        
     }
 
 }
