@@ -1,26 +1,30 @@
 import task.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
+
 public class Main {
 
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
 
-        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW);
+        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
         taskManager.createTask(task);
 
-        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW);
+        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         taskManager.createTask(task2);
 
         Epic epic = new Epic("Перезд", "Собрать вещи для переезда");
         taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, epic.getId());
+        SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epic.getId());
         taskManager.createSubTask(subTask);
 
-        SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, epic.getId());
+        SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 30), Duration.ofMinutes(1), epic.getId());
         taskManager.createSubTask(subTask2);
 
-        SubTask subTask3 = new SubTask("Смыть пену", "Смыть пену", Status.NEW, epic.getId());
+        SubTask subTask3 = new SubTask("Смыть пену", "Смыть пену", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 32), Duration.ofMinutes(1), epic.getId());
         taskManager.createSubTask(subTask3);
 
 

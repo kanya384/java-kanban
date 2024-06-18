@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
     private final File outputFile;
-    private static final String title = "id,type,name,status,description,epic";
+    private static final String title = "id,type,name,status,description,epic,start_time,duration";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
     FileBackedTaskManager(File outputFile) {
         this.outputFile = outputFile;
@@ -19,14 +24,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         File tmpFile = new File("tasks.csv");
 
         FileBackedTaskManager taskManager1 = new FileBackedTaskManager(tmpFile);
-        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW);
+        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
         taskManager1.createTask(task);
 
-        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW);
+        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
         taskManager1.createTask(task2);
 
-        Epic epic = new Epic("Перезд", "Собрать вещи для переезда");
+        Epic epic = new Epic("Помыть машину", "Помыть машину перед выходными");
         taskManager1.createEpic(epic);
+
+        SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epic.getId());
+        taskManager1.createSubTask(subTask);
+
+        SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 30), Duration.ofMinutes(1), epic.getId());
+        taskManager1.createSubTask(subTask2);
 
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(tmpFile);
 
@@ -180,10 +191,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String description = items[4];
         Status status = stringToStatus(items[3]);
 
+        LocalDateTime startDateTime = null;
+        if (!items[6].isBlank()) {
+            startDateTime = LocalDateTime.parse(items[6], DATE_TIME_FORMATTER);
+        }
+
+        Duration duration = Duration.ofMinutes(Integer.parseInt(items[7]));
+
         switch (taskType) {
 
             case TaskType.TASK -> {
-                Task task = new Task(name, description, status);
+                Task task = new Task(name, description, status, startDateTime, duration);
                 task.setId(id);
                 return task;
             }
@@ -197,7 +215,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
             case TaskType.SUBTASK -> {
                 int epicId = Integer.parseInt(items[5]);
-                SubTask subTask = new SubTask(name, description, status, epicId);
+                SubTask subTask = new SubTask(name, description, status, startDateTime, duration, epicId);
                 subTask.setId(id);
                 return subTask;
             }
@@ -211,12 +229,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         switch (taskType) {
 
             case TaskType.EPIC, TaskType.TASK -> {
-                return String.format("%d,%s,%s,%s,%s,", task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription());
+                return String.format("%d,%s,%s,%s,%s,,%s,%d", task.getId(), taskType, task.getName(), task.getStatus(), task.getDescription(), task.getStartTime() != null ? task.getStartTime().format(DATE_TIME_FORMATTER) : "", task.getDuration().toMinutes());
             }
 
             case TaskType.SUBTASK -> {
                 SubTask subTask = (SubTask) task;
-                return String.format("%d,%s,%s,%s,%s,%d", subTask.getId(), taskType, subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicId());
+                return String.format("%d,%s,%s,%s,%s,%d,%s,%d", subTask.getId(), taskType, subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicId(), subTask.getStartTime().format(DATE_TIME_FORMATTER), subTask.getDuration().toMinutes());
             }
         }
 

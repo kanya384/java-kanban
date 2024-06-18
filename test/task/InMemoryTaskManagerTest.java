@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +22,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addNewTask() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
+        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         int taskId = taskManager.createTask(task);
 
         final Task savedTask = taskManager.getTaskById(taskId);
@@ -56,7 +59,7 @@ class InMemoryTaskManagerTest {
         Epic epic = new Epic("Test addNewEpic", "Test addNewEpic description");
         int epicId = taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("Test addNewSubTAsk", "Test addNewSubTAsk description", Status.NEW, epicId);
+        SubTask subTask = new SubTask("Test addNewSubTAsk", "Test addNewSubTAsk description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epicId);
         int subTaskId = taskManager.createSubTask(subTask);
 
         final SubTask savedTask = taskManager.getSubTaskById(subTaskId);
@@ -83,7 +86,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldReturnTaskById() {
-        Task task = new Task("test", "test", Status.NEW);
+        Task task = new Task("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         taskManager.createTask(task);
 
         Task task2 = taskManager.getTaskById(task.getId());
@@ -96,7 +99,7 @@ class InMemoryTaskManagerTest {
         Epic epic = new Epic("test", "test");
         taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("test", "test", Status.NEW, 1);
+        SubTask subTask = new SubTask("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), 1);
         taskManager.createSubTask(subTask);
 
         SubTask subTask2 = taskManager.getSubTaskById(subTask.getId());
@@ -119,10 +122,10 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldEqualTaskFieldsBeforeAndAfterCreate() {
-        Task oldTask = new Task("test", "test", Status.NEW);
+        Task oldTask = new Task("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         taskManager.createTask(oldTask);
 
-        Task newTask =taskManager.getTaskById(oldTask.getId());
+        Task newTask = taskManager.getTaskById(oldTask.getId());
 
 
         Assertions.assertEquals(oldTask.getName(), newTask.getName());
@@ -137,7 +140,7 @@ class InMemoryTaskManagerTest {
         Epic epic = new Epic("test", "test");
         taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("test", "test", Status.NEW, 1);
+        SubTask subTask = new SubTask("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), 1);
         taskManager.createSubTask(subTask);
 
         ArrayList<SubTask> subTasksBeforeUpdate = taskManager.getSubTasks();
@@ -155,7 +158,7 @@ class InMemoryTaskManagerTest {
         Epic epic = new Epic("test", "test");
         taskManager.createEpic(epic);
 
-        SubTask subTask = new SubTask("test", "test", Status.NEW, 1);
+        SubTask subTask = new SubTask("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), 1);
         taskManager.createSubTask(subTask);
 
         taskManager.deleteSubTaskById(subTask.getId());
