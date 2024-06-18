@@ -22,7 +22,7 @@ public class FileBackedTaskManagerTest {
 
             String[] lines = Files.readString(file.toPath()).split("\n");
             assertEquals(lines.length, 1);
-            assertEquals(lines[0], "id,type,name,status,description,epic");
+            assertEquals(lines[0], "id,type,name,status,description,epic,start_time,duration");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -40,7 +40,7 @@ public class FileBackedTaskManagerTest {
             Epic epic = new Epic("Помыть машину", "Помыть машину перед праздниками");
             taskManager.createEpic(epic);
 
-            SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epic.getId());
+            SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(2), epic.getId());
             taskManager.createSubTask(subTask);
 
             String[] lines = Files.readString(file.toPath()).split("\n");
@@ -48,9 +48,9 @@ public class FileBackedTaskManagerTest {
             assertEquals(lines.length, 4);
 
             assertEquals(lines[0], "id,type,name,status,description,epic,start_time,duration");
-            assertEquals(lines[1], "1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,");
-            assertEquals(lines[2], "2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,");
-            assertEquals(lines[3], "3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,");
+            assertEquals(lines[1], "1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:20,1");
+            assertEquals(lines[2], "2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,19.06.24 10:20,2");
+            assertEquals(lines[3], "3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:20,2");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -79,9 +79,9 @@ public class FileBackedTaskManagerTest {
 
                 writer.write("""
                         id,type,name,status,description,epic,start_time,duration
-                        1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,,
-                        2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,,
-                        3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,,""");
+                        1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:20,10
+                        2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,19.06.24 10:20,1
+                        3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:20,1""");
             }
 
 
