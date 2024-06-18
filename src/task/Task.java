@@ -2,9 +2,10 @@ package task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task> {
     protected int id;
     protected String name;
     protected String description;
@@ -86,11 +87,27 @@ public class Task {
 
     @Override
     public String toString() {
+        String startTimeString = "";
+        if (startTime != null) {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
+            startTimeString = startTime.format(dateTimeFormatter);
+        }
         return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", start_time=" + startTimeString +
+                ", duration=" + duration.toMinutes() + "мин." +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Task t) {
+        if (startTime == null || startTime.isAfter(t.getStartTime())) {
+            return 1;
+        }
+
+        return -1;
     }
 }

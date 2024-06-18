@@ -2,6 +2,7 @@ package task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -58,12 +59,28 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+        String startTimeString = "";
+        String endTimeString = "";
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
+
+        if (startTime != null) {
+            startTimeString = startTime.format(dateTimeFormatter);
+        }
+
+        if (endTime != null) {
+            endTimeString = endTime.format(dateTimeFormatter);
+        }
+
         return "Epic{" +
                 "id=" + id +
                 ", subTaskIds.length=" + subTaskIds.size() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", start_time=" + startTimeString +
+                ", duration=" + duration.toMinutes() + "мин." +
+                ", end_time=" + endTimeString +
                 '}';
     }
 }

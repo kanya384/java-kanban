@@ -53,6 +53,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             System.out.println("epics sizes are not equal");
         }
 
+        System.out.println(taskManager1.getPrioritizedTasks());
 
     }
 
