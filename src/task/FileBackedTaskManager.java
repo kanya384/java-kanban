@@ -8,6 +8,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
     private final File outputFile;
@@ -137,13 +140,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             String[] lines = Files.readString(file.toPath()).split("\n");
             FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
+            List<Task> tasks = Arrays.stream(lines)
+                    .skip(1)
+                    .map(line -> Optional.ofNullable(convertStringToTask(line)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .toList();
 
-            for (String line : lines) {
-                if (line.equals(title) || line.isBlank()) {
-                    continue;
-                }
-
-                Task task = convertStringToTask(line);
+            for (Task task : tasks) {
                 TaskType taskType = toEnum(task);
                 switch (taskType) {
                     case TASK -> fileBackedTaskManager.createTask(task);
@@ -155,6 +159,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     default -> throw new IllegalStateException("Unexpected value: " + taskType);
                 }
             }
+
 
             return fileBackedTaskManager;
         } catch (IOException e) {
@@ -221,7 +226,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 return subTask;
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + taskType);
+            default -> {
+                return null;
+            }
         }
     }
 

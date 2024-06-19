@@ -14,29 +14,25 @@ public class InMemoryTaskManager implements TaskManager {
     private final TreeSet<Task> prioritizedTasks = new TreeSet<>();
 
     @Override
-    public ArrayList<Task> getTasks() {
-        return new ArrayList<>(tasks.values());
+    public List<Task> getTasks() {
+        return tasks.values().stream().toList();
     }
 
     @Override
-    public ArrayList<SubTask> getSubTasks() {
-        return new ArrayList<>(subTasks.values());
+    public List<SubTask> getSubTasks() {
+        return subTasks.values().stream().toList();
     }
 
     @Override
-    public ArrayList<Epic> getEpics() {
-        return new ArrayList<>(epics.values());
+    public List<Epic> getEpics() {
+        return epics.values().stream().toList();
     }
 
     @Override
-    public ArrayList<SubTask> getEpicSubtasks(int epicId) {
-        ArrayList<SubTask> result = new ArrayList<>();
-        for (SubTask subtask : subTasks.values()) {
-            if (subtask.getEpicId() == epicId) {
-                result.add(subtask);
-            }
-        }
-        return result;
+    public List<SubTask> getEpicSubtasks(int epicId) {
+        return subTasks.values().stream()
+                .filter(subTask -> subTask.getEpicId() == epicId)
+                .toList();
     }
 
     @Override
@@ -210,6 +206,12 @@ public class InMemoryTaskManager implements TaskManager {
         return prioritizedTasks.stream().toList();
     }
 
+    @Override
+    public boolean isIntersectedTasks(Task task1, Task task2) {
+        return ((task1.getStartTime().isBefore(task2.getEndTime()))
+                && (task2.getStartTime().isBefore(task1.getEndTime())));
+    }
+
     private void updateEpicsStatus(int epicId) {
         Epic epic = epics.get(epicId);
         ArrayList<Integer> subTaskIds = epic.getSubTaskIds();
@@ -271,12 +273,6 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter((task) -> isIntersectedTasks(input, task))
                 .toList();
         return !intersectedTasks.isEmpty();
-    }
-
-    private boolean isIntersectedTasks(Task task1, Task task2) {
-        return ((task1.getStartTime().isAfter(task2.getStartTime()) && task1.getEndTime().isBefore(task2.getEndTime()))
-                || (task2.getStartTime().isAfter(task1.getStartTime()) && task2.getEndTime().isBefore(task1.getEndTime()))
-                || (task2.getStartTime().isEqual(task1.getStartTime()) || task2.getEndTime().isEqual(task1.getEndTime())));
     }
 
 }

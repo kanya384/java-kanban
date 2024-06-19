@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,7 +31,7 @@ class InMemoryTaskManagerTest {
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
 
-        final ArrayList<Task> tasks = taskManager.getTasks();
+        final List<Task> tasks = taskManager.getTasks();
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
@@ -47,7 +48,7 @@ class InMemoryTaskManagerTest {
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(epic, savedTask, "Задачи не совпадают.");
 
-        final ArrayList<Epic> epics = taskManager.getEpics();
+        final List<Epic> epics = taskManager.getEpics();
 
         assertNotNull(epics, "Задачи не возвращаются.");
         assertEquals(1, epics.size(), "Неверное количество задач.");
@@ -67,7 +68,7 @@ class InMemoryTaskManagerTest {
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(subTask, savedTask, "Задачи не совпадают.");
 
-        final ArrayList<SubTask> subTasks = taskManager.getSubTasks();
+        final List<SubTask> subTasks = taskManager.getSubTasks();
 
         assertNotNull(subTasks, "Задачи не возвращаются.");
         assertEquals(1, subTasks.size(), "Неверное количество задач.");
@@ -143,12 +144,12 @@ class InMemoryTaskManagerTest {
         SubTask subTask = new SubTask("test", "test", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), 1);
         taskManager.createSubTask(subTask);
 
-        ArrayList<SubTask> subTasksBeforeUpdate = taskManager.getSubTasks();
+        List<SubTask> subTasksBeforeUpdate = taskManager.getSubTasks();
 
         subTask.setId(1);
         taskManager.updateSubTask(subTask);
 
-        ArrayList<SubTask> subTasksAfterUpdate = taskManager.getSubTasks();
+        List<SubTask> subTasksAfterUpdate = taskManager.getSubTasks();
 
         Assertions.assertArrayEquals(subTasksBeforeUpdate.toArray(), subTasksAfterUpdate.toArray());
     }
@@ -165,5 +166,50 @@ class InMemoryTaskManagerTest {
 
         ArrayList<Integer> subTasksList = taskManager.getEpicById(epic.getId()).getSubTaskIds();
         Assertions.assertEquals(subTasksList.size(), 0);
+    }
+
+    @Test
+    void shouldReturnTrueWhenTaskIncludesAnotherTask() {
+        Task task1 = new Task("task1", "task1", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 00), Duration.ofMinutes(10));
+
+        Task task2 = new Task("task2", "task2", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 00), Duration.ofMinutes(2));
+
+        boolean isIntersected = taskManager.isIntersectedTasks(task1, task2);
+
+        Assertions.assertTrue(isIntersected);
+
+        isIntersected = taskManager.isIntersectedTasks(task2, task1);
+
+        Assertions.assertTrue(isIntersected);
+    }
+
+    @Test
+    void shouldReturnTrueWhenTaskInctersectsAnotherTask() {
+        Task task1 = new Task("task1", "task1", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 00), Duration.ofMinutes(10));
+
+        Task task2 = new Task("task2", "task2", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 05), Duration.ofMinutes(15));
+
+        boolean isIntersected = taskManager.isIntersectedTasks(task1, task2);
+
+        Assertions.assertTrue(isIntersected);
+
+        isIntersected = taskManager.isIntersectedTasks(task2, task1);
+
+        Assertions.assertTrue(isIntersected);
+    }
+
+    @Test
+    void shouldBeFalseWhenTasksRangesAreNotIntersects() {
+        Task task1 = new Task("task1", "task1", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 00), Duration.ofMinutes(10));
+
+        Task task2 = new Task("task2", "task2", Status.NEW, LocalDateTime.of(2024, 06, 19, 15, 10), Duration.ofMinutes(15));
+
+        boolean isIntersected = taskManager.isIntersectedTasks(task1, task2);
+
+        Assertions.assertFalse(isIntersected);
+
+        isIntersected = taskManager.isIntersectedTasks(task2, task1);
+
+        Assertions.assertFalse(isIntersected);
     }
 }

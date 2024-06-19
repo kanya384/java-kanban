@@ -34,7 +34,7 @@ public class FileBackedTaskManagerTest {
             File file = File.createTempFile("test", "csv");
             FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
 
-            Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
+            Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 10), Duration.ofMinutes(1));
             taskManager.createTask(task);
 
             Epic epic = new Epic("Помыть машину", "Помыть машину перед праздниками");
@@ -45,10 +45,10 @@ public class FileBackedTaskManagerTest {
 
             String[] lines = Files.readString(file.toPath()).split("\n");
 
-            assertEquals(lines.length, 4);
+            assertEquals(4, lines.length);
 
             assertEquals(lines[0], "id,type,name,status,description,epic,start_time,duration");
-            assertEquals(lines[1], "1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:20,1");
+            assertEquals(lines[1], "1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:10,1");
             assertEquals(lines[2], "2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,19.06.24 10:20,2");
             assertEquals(lines[3], "3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:20,2");
         } catch (IOException e) {
@@ -81,7 +81,7 @@ public class FileBackedTaskManagerTest {
                         id,type,name,status,description,epic,start_time,duration
                         1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:20,10
                         2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,19.06.24 10:20,1
-                        3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:20,1""");
+                        3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:30,1""");
             }
 
 
