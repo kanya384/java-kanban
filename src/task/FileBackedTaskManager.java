@@ -23,40 +23,43 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public static void main(String[] args) {
+        try {
+            File tmpFile = new File("tasks.csv");
 
-        File tmpFile = new File("tasks.csv");
+            FileBackedTaskManager taskManager1 = new FileBackedTaskManager(tmpFile);
+            Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
+            taskManager1.createTask(task);
 
-        FileBackedTaskManager taskManager1 = new FileBackedTaskManager(tmpFile);
-        Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
-        taskManager1.createTask(task);
+            Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
+            System.out.println(taskManager1.createTask(task2));
 
-        Task task2 = new Task("Купить колу", "Купить колу в магните", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 21, 0, 0), Duration.ofMinutes(10));
-        System.out.println(taskManager1.createTask(task2));
+            Epic epic = new Epic("Помыть машину", "Помыть машину перед выходными");
+            taskManager1.createEpic(epic);
 
-        Epic epic = new Epic("Помыть машину", "Помыть машину перед выходными");
-        taskManager1.createEpic(epic);
+            SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epic.getId());
+            taskManager1.createSubTask(subTask);
 
-        SubTask subTask = new SubTask("Нанести пену", "Нанести пену на машину", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), epic.getId());
-        taskManager1.createSubTask(subTask);
+            SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 30), Duration.ofMinutes(1), epic.getId());
+            taskManager1.createSubTask(subTask2);
 
-        SubTask subTask2 = new SubTask("Подождать пять минут", "Подождать пять минут", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 30), Duration.ofMinutes(1), epic.getId());
-        taskManager1.createSubTask(subTask2);
+            FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(tmpFile);
 
-        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(tmpFile);
+            if (taskManager1.getTasks().size() != taskManager2.getTasks().size()) {
+                System.out.println("tasks sizes are not equal");
+            }
 
-        if (taskManager1.getTasks().size() != taskManager2.getTasks().size()) {
-            System.out.println("tasks sizes are not equal");
+            if (taskManager1.getSubTasks().size() != taskManager2.getSubTasks().size()) {
+                System.out.println("subtasks sizes are not equal");
+            }
+
+            if (taskManager1.getEpics().size() != taskManager2.getEpics().size()) {
+                System.out.println("epics sizes are not equal");
+            }
+
+            System.out.println(taskManager1.getPrioritizedTasks());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        if (taskManager1.getSubTasks().size() != taskManager2.getSubTasks().size()) {
-            System.out.println("subtasks sizes are not equal");
-        }
-
-        if (taskManager1.getEpics().size() != taskManager2.getEpics().size()) {
-            System.out.println("epics sizes are not equal");
-        }
-
-        System.out.println(taskManager1.getPrioritizedTasks());
 
     }
 
@@ -79,14 +82,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public int createTask(Task task) {
+    public int createTask(Task task) throws IntersectsExistingTaskException {
         int taskId = super.createTask(task);
         save();
         return taskId;
     }
 
     @Override
-    public int createSubTask(SubTask subTask) {
+    public int createSubTask(SubTask subTask) throws IntersectsExistingTaskException, NoEpicException {
         int subTaskId = super.createSubTask(subTask);
         save();
         return subTaskId;
@@ -162,7 +165,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
 
             return fileBackedTaskManager;
-        } catch (IOException e) {
+        } catch (IOException | NoEpicException | IntersectsExistingTaskException e) {
             throw new ManagerSaveException(e);
         }
     }

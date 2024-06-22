@@ -83,9 +83,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int createTask(Task task) {
+    public int createTask(Task task) throws IntersectsExistingTaskException {
         if (isIntersectsExistingTask(task)) {
-            return -1;
+            throw new IntersectsExistingTaskException();
         }
 
         int id = ++counter;
@@ -97,16 +97,22 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int createSubTask(SubTask subTask) {
+    public int createSubTask(SubTask subTask) throws NoEpicException, IntersectsExistingTaskException {
+        Epic epic = epics.get(subTask.getEpicId());
+
+        if (epic == null) {
+            throw new NoEpicException(String.format("no epic with id: %d", subTask.getEpicId()));
+        }
+
         if (isIntersectsExistingTask(subTask)) {
-            return -1;
+            throw new IntersectsExistingTaskException();
         }
 
         int id = ++counter;
         subTask.setId(id);
         subTasks.put(subTask.getId(), subTask);
 
-        Epic epic = epics.get(subTask.getEpicId());
+
         epic.addSubTaskId(subTask.getId());
 
         if (epic.getStartTime() == null || epic.getStartTime().isAfter(subTask.getStartTime())) {
@@ -214,14 +220,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void updateEpicsStatus(int epicId) {
         Epic epic = epics.get(epicId);
-        ArrayList<Integer> subTaskIds = epic.getSubTaskIds();
+        final ArrayList<Integer> subTaskIds = epic.getSubTaskIds();
         Status status;
 
         boolean isAllSubTasksNew = true;
         boolean isAllSubTasksDone = true;
 
-        for (Integer subTaskId : subTaskIds) {
-            SubTask subTask = subTasks.get(subTaskId);
+        List<SubTask> subTasksOfEpic = subTasks.values().stream()
+                .filter(subTask -> subTaskIds.contains(subTask.getId()))
+                .toList();
+
+        for (SubTask subTask : subTasksOfEpic) {
+
+            if (subTask.getStatus() == Status.IN_PROGRESS) {
+                isAllSubTasksNew = false;
+                isAllSubTasksDone = false;
+                break;
+            }
+
             if (subTask.getStatus() != Status.NEW) {
                 isAllSubTasksNew = false;
             }
@@ -229,6 +245,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (subTask.getStatus() != Status.DONE) {
                 isAllSubTasksDone = false;
             }
+
         }
 
         if (isAllSubTasksNew) {

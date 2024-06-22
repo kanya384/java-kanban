@@ -1,39 +1,41 @@
 package task;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+    private File file;
+
+    @BeforeEach
+    public void beforeEach() {
+        assertDoesNotThrow(() -> {
+            this.file = File.createTempFile("test", "csv");
+            this.taskManager = new FileBackedTaskManager(file);
+        });
+    }
 
     @Test
     void shouldStoreOnlyTitleIfNoTasksAdded() {
-        try {
-            File file = File.createTempFile("test", "csv");
-            FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
-
+        assertDoesNotThrow(() -> {
             String[] lines = Files.readString(file.toPath()).split("\n");
             assertEquals(lines.length, 1);
             assertEquals(lines[0], "id,type,name,status,description,epic,start_time,duration");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     @Test
     void shouldStoreTasksToFile() {
-        try {
-            File file = File.createTempFile("test", "csv");
-            FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
-
+        assertDoesNotThrow(() -> {
             Task task = new Task("Подстричь газон", "Тщательно подстричь газон", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 10), Duration.ofMinutes(1));
             taskManager.createTask(task);
 
@@ -51,28 +53,19 @@ public class FileBackedTaskManagerTest {
             assertEquals(lines[1], "1,TASK,Подстричь газон,NEW,Тщательно подстричь газон,,19.06.24 10:10,1");
             assertEquals(lines[2], "2,EPIC,Помыть машину,NEW,Помыть машину перед праздниками,,19.06.24 10:20,2");
             assertEquals(lines[3], "3,SUBTASK,Нанести пену,NEW,Нанести пену на машину,2,19.06.24 10:20,2");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     @Test
     void shouldLoadNoTasksFromEmptyFile() {
-        try {
-            File file = File.createTempFile("test", "csv");
-            FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
-
-            assertEquals(taskManager.getSubTasks().size(), 0);
-            assertEquals(taskManager.getTasks().size(), 0);
-            assertEquals(taskManager.getEpics().size(), 0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        assertEquals(taskManager.getSubTasks().size(), 0);
+        assertEquals(taskManager.getTasks().size(), 0);
+        assertEquals(taskManager.getEpics().size(), 0);
     }
 
     @Test
     void shouldLoadTasksFromFile() {
-        try {
+        assertDoesNotThrow(() -> {
             File file = File.createTempFile("test", "csv");
 
             try (FileWriter writer = new FileWriter(file)) {
@@ -104,9 +97,6 @@ public class FileBackedTaskManagerTest {
             assertEquals(expectedTask, taskManager.getTasks().getFirst());
             assertEquals(expectedEpic, taskManager.getEpics().getFirst());
             assertEquals(expectedSubTask, taskManager.getSubTasks().getFirst());
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 }

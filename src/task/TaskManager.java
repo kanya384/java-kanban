@@ -24,9 +24,9 @@ public interface TaskManager {
 
     Epic getEpicById(int id);
 
-    int createTask(Task task);
+    int createTask(Task task) throws IntersectsExistingTaskException;
 
-    int createSubTask(SubTask subTask);
+    int createSubTask(SubTask subTask) throws IntersectsExistingTaskException, NoEpicException;
 
     int createEpic(Epic epic);
 
