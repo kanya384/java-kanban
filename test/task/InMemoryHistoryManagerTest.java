@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +24,7 @@ class InMemoryHistoryManagerTest {
     @Test
     void shouldReplacePreviousVersionsOfTask() {
 
-        Task task = new Task("test", "test description", Status.NEW);
+        Task task = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task.setId(1);
 
         inMemoryHistoryManager.add(task);
@@ -62,7 +65,7 @@ class InMemoryHistoryManagerTest {
     @Test
     void shouldReplacePreviousVersionsOfSubTask() {
 
-        SubTask subTask = new SubTask("test", "test description", Status.NEW, 1);
+        SubTask subTask = new SubTask("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1), 1);
         subTask.setId(1);
 
         inMemoryHistoryManager.add(subTask);
@@ -81,17 +84,17 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldAddTasksInRightOrder() {
-        Task task = new Task("test", "test description", Status.NEW);
+        Task task = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task.setId(1);
 
         inMemoryHistoryManager.add(task);
 
-        Task task2 = new Task("test", "test description", Status.NEW);
+        Task task2 = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task2.setId(2);
 
         inMemoryHistoryManager.add(task2);
 
-        Task task3 = new Task("test", "test description", Status.NEW);
+        Task task3 = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task3.setId(3);
 
         inMemoryHistoryManager.add(task3);
@@ -99,24 +102,24 @@ class InMemoryHistoryManagerTest {
         List<Task> history = inMemoryHistoryManager.getHistory();
 
         for (int i = 0; i < history.size(); i++) {
-            assertEquals(i+1, history.get(i).getId());
+            assertEquals(i + 1, history.get(i).getId());
         }
     }
 
     @Test
     void shouldRemoveTaskById() {
 
-        Task task = new Task("test", "test description", Status.NEW);
+        Task task = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task.setId(1);
 
         inMemoryHistoryManager.add(task);
 
-        Task task2 = new Task("test", "test description", Status.NEW);
+        Task task2 = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task2.setId(2);
 
         inMemoryHistoryManager.add(task2);
 
-        Task task3 = new Task("test", "test description", Status.NEW);
+        Task task3 = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task3.setId(3);
 
         inMemoryHistoryManager.add(task3);
@@ -133,13 +136,14 @@ class InMemoryHistoryManagerTest {
 
         for (Task historyItem : history) {
             assertNotEquals(task2, historyItem);
-        };
+        }
+        ;
     }
 
     @Test
     void shouldBeEmptyAfterRemoveIfSingleTask() {
 
-        Task task = new Task("test", "test description", Status.NEW);
+        Task task = new Task("test", "test description", Status.NEW, LocalDateTime.of(2024, Month.JUNE, 19, 10, 20), Duration.ofMinutes(1));
         task.setId(1);
 
         inMemoryHistoryManager.add(task);
