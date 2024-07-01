@@ -6,7 +6,7 @@ public class Managers {
     static final File file = new File("./tasks.csv");
 
     public static TaskManager getDefault() {
-        return new FileBackedTaskManager(file);
+        return FileBackedTaskManager.loadFromFile(file);
     }
 
     public static HistoryManager getDefaultHistory() {

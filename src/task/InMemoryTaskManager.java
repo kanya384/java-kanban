@@ -99,7 +99,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int createSubTask(SubTask subTask) throws NoEpicException, IntersectsExistingTaskException {
         Epic epic = epics.get(subTask.getEpicId());
-
         if (epic == null) {
             throw new NoEpicException(String.format("no epic with id: %d", subTask.getEpicId()));
         }
@@ -123,11 +122,10 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setEndTime(subTask.getEndTime());
         }
 
-        epic.setDuration(epic.getDuration().plus(subTask.getDuration()));
+        epic.addDuration(subTask.getDuration());
 
         epics.put(epic.getId(), epic);
         updateEpicsStatus(subTask.getEpicId());
-
         updatePrioritizedTasks();
         return id;
     }
