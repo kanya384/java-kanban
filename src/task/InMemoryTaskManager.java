@@ -62,22 +62,31 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(int id) {
+    public Task getTaskById(int id) throws NotFoundException {
         Task task = tasks.get(id);
+        if (task == null) {
+            throw new NotFoundException(String.format("не найдена задача с id = %d", id));
+        }
         historyManager.add(task);
         return task;
     }
 
     @Override
-    public SubTask getSubTaskById(int id) {
+    public SubTask getSubTaskById(int id) throws NotFoundException {
         SubTask subTask = subTasks.get(id);
+        if (subTask == null) {
+            throw new NotFoundException(String.format("не найдена подзадача с id = %d", id));
+        }
         historyManager.add(subTask);
         return subTask;
     }
 
     @Override
-    public Epic getEpicById(int id) {
+    public Epic getEpicById(int id) throws NotFoundException {
         Epic epic = epics.get(id);
+        if (epic == null) {
+            throw new NotFoundException(String.format("не найден эпик с id = %d", id));
+        }
         historyManager.add(epic);
         return epic;
     }

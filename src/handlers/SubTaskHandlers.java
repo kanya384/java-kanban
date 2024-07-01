@@ -22,22 +22,26 @@ public class SubTaskHandlers extends BaseTaskHandlers {
 
     @Override
     void handleById(HttpExchange exchange) throws IOException {
-        Optional<Integer> idOpt = getIdFromPath(exchange);
+        try {
+            Optional<Integer> idOpt = getIdFromPath(exchange);
 
-        if (idOpt.isEmpty()) {
-            sendText(exchange, 400, "Некорректный идентификатор подзадачи");
-            return;
+            if (idOpt.isEmpty()) {
+                sendText(exchange, 400, "Некорректный идентификатор подзадачи");
+                return;
+            }
+
+            Task task = taskManager.getSubTaskById(idOpt.get());
+
+            if (task == null) {
+                sendText(exchange, 404, String.format("Подзадача с идентификатором " + idOpt.get() + " не найдена"));
+                return;
+            }
+
+            String responseString = gson.toJson(task);
+            sendText(exchange, 200, responseString);
+        } catch (NotFoundException e) {
+            sendText(exchange, 404, e.getMessage());
         }
-
-        Task task = taskManager.getSubTaskById(idOpt.get());
-
-        if (task == null) {
-            sendText(exchange, 404, String.format("Подзадача с идентификатором " + idOpt.get() + " не найдена"));
-            return;
-        }
-
-        String responseString = gson.toJson(task);
-        sendText(exchange, 200, responseString);
     }
 
     @Override

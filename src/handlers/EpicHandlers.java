@@ -2,6 +2,7 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import task.Epic;
+import task.NotFoundException;
 import task.Task;
 import task.TaskManager;
 
@@ -24,22 +25,26 @@ public class EpicHandlers extends BaseTaskHandlers {
 
     @Override
     void handleById(HttpExchange exchange) throws IOException {
-        Optional<Integer> idOpt = getIdFromPath(exchange);
+        try {
+            Optional<Integer> idOpt = getIdFromPath(exchange);
 
-        if (idOpt.isEmpty()) {
-            sendText(exchange, 400, "Некорректный идентификатор эпика");
-            return;
+            if (idOpt.isEmpty()) {
+                sendText(exchange, 400, "Некорректный идентификатор эпика");
+                return;
+            }
+
+            Task task = taskManager.getEpicById(idOpt.get());
+
+            if (task == null) {
+                sendText(exchange, 404, String.format("Эпик с идентификатором " + idOpt.get() + " не найден"));
+                return;
+            }
+
+            String responseString = gson.toJson(task);
+            sendText(exchange, 200, responseString);
+        } catch (NotFoundException e) {
+            sendText(exchange, 404, e.getMessage());
         }
-
-        Task task = taskManager.getEpicById(idOpt.get());
-
-        if (task == null) {
-            sendText(exchange, 404, String.format("Эпик с идентификатором " + idOpt.get() + " не найден"));
-            return;
-        }
-
-        String responseString = gson.toJson(task);
-        sendText(exchange, 200, responseString);
     }
 
     @Override
@@ -78,23 +83,22 @@ public class EpicHandlers extends BaseTaskHandlers {
 
     @Override
     protected void handleEpicSubtasks(HttpExchange exchange) throws IOException {
-        Optional<Integer> idOpt = getIdFromPath(exchange);
-        if (idOpt.isEmpty()) {
-            sendText(exchange, 400, "не указа id эпика");
-            return;
+        try {
+            Optional<Integer> idOpt = getIdFromPath(exchange);
+            if (idOpt.isEmpty()) {
+                sendText(exchange, 400, "не указа id эпика");
+                return;
+            }
+
+            Integer epicId = idOpt.get();
+
+            taskManager.getEpicById(epicId);
+
+            String responseString = gson.toJson(taskManager.getEpicSubtasks(epicId));
+            sendText(exchange, 200, responseString);
+        } catch (NotFoundException e) {
+            sendText(exchange, 404, e.getMessage());
         }
-
-        Integer epicId = idOpt.get();
-
-        Epic epic = taskManager.getEpicById(epicId);
-
-        if (epic == null) {
-            sendText(exchange, 404, String.format("нет эпика с id = %d", epicId));
-            return;
-        }
-
-        String responseString = gson.toJson(taskManager.getEpicSubtasks(epicId));
-        sendText(exchange, 200, responseString);
     }
 
 

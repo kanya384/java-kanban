@@ -2,6 +2,7 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import task.IntersectsExistingTaskException;
+import task.NotFoundException;
 import task.Task;
 import task.TaskManager;
 
@@ -24,22 +25,26 @@ public class TaskHandlers extends BaseTaskHandlers {
 
     @Override
     void handleById(HttpExchange exchange) throws IOException {
-        Optional<Integer> idOpt = getIdFromPath(exchange);
+        try {
+            Optional<Integer> idOpt = getIdFromPath(exchange);
 
-        if (idOpt.isEmpty()) {
-            sendText(exchange, 400, "Некорректный идентификатор задачи");
-            return;
+            if (idOpt.isEmpty()) {
+                sendText(exchange, 400, "Некорректный идентификатор задачи");
+                return;
+            }
+
+            Task task = taskManager.getTaskById(idOpt.get());
+
+            if (task == null) {
+                sendText(exchange, 404, String.format("Задача с идентификатором " + idOpt.get() + " не найдена"));
+                return;
+            }
+
+            String responseString = gson.toJson(task);
+            sendText(exchange, 200, responseString);
+        } catch (NotFoundException e) {
+            sendText(exchange, 404, e.getMessage());
         }
-
-        Task task = taskManager.getTaskById(idOpt.get());
-
-        if (task == null) {
-            sendText(exchange, 404, String.format("Задача с идентификатором " + idOpt.get() + " не найдена"));
-            return;
-        }
-
-        String responseString = gson.toJson(task);
-        sendText(exchange, 200, responseString);
     }
 
     @Override
@@ -53,7 +58,6 @@ public class TaskHandlers extends BaseTaskHandlers {
 
             Task task = optionalTask.get();
             try {
-
                 if (task.getId() != 0) {
                     taskManager.updateTask(task);
                     sendText(exchange, 200, "Задача успешно обновлена");
