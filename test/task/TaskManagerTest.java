@@ -35,19 +35,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void addNewEpic() {
-        Epic epic = new Epic("Test addNewEpic", "Test addNewEpic description");
-        int epicId = taskManager.createEpic(epic);
+        assertDoesNotThrow(() -> {
+            Epic epic = new Epic("Test addNewEpic", "Test addNewEpic description");
+            int epicId = taskManager.createEpic(epic);
 
-        final Epic savedTask = taskManager.getEpicById(epicId);
+            final Epic savedTask = taskManager.getEpicById(epicId);
 
-        assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(epic, savedTask, "Задачи не совпадают.");
+            assertNotNull(savedTask, "Задача не найдена.");
+            assertEquals(epic, savedTask, "Задачи не совпадают.");
 
-        final List<Epic> epics = taskManager.getEpics();
+            final List<Epic> epics = taskManager.getEpics();
 
-        assertNotNull(epics, "Задачи не возвращаются.");
-        assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(epic, epics.getFirst(), "Задачи не совпадают.");
+            assertNotNull(epics, "Задачи не возвращаются.");
+            assertEquals(1, epics.size(), "Неверное количество задач.");
+            assertEquals(epic, epics.getFirst(), "Задачи не совпадают.");
+        });
     }
 
     @Test
@@ -74,12 +76,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void shouldReturnEpicById() {
-        Epic epic = new Epic("test", "test");
-        taskManager.createEpic(epic);
+        assertDoesNotThrow(() -> {
+            Epic epic = new Epic("test", "test");
+            taskManager.createEpic(epic);
 
-        Epic epic2 = taskManager.getEpicById(epic.getId());
+            Epic epic2 = taskManager.getEpicById(epic.getId());
 
-        Assertions.assertEquals(epic, epic2);
+            Assertions.assertEquals(epic, epic2);
+        });
     }
 
     @Test

@@ -1,5 +1,6 @@
 package handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import task.TaskManager;
@@ -10,7 +11,8 @@ abstract class BaseTaskHandlers extends BaseHttpHandler implements HttpHandler {
     protected TaskManager taskManager;
     protected String basePath;
 
-    BaseTaskHandlers(TaskManager taskManager, String basePath) {
+    BaseTaskHandlers(Gson gson, TaskManager taskManager, String basePath) {
+        super(gson);
         this.taskManager = taskManager;
         this.basePath = basePath;
     }

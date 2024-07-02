@@ -1,5 +1,6 @@
 package handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import task.*;
 
@@ -10,8 +11,8 @@ import java.util.Optional;
 
 public class SubTaskHandlers extends BaseTaskHandlers {
 
-    public SubTaskHandlers(TaskManager taskManager, String basePath) {
-        super(taskManager, basePath);
+    public SubTaskHandlers(Gson gson, TaskManager taskManager, String basePath) {
+        super(gson, taskManager, basePath);
     }
 
     @Override

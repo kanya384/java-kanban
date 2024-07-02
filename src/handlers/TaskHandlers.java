@@ -1,5 +1,6 @@
 package handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import task.IntersectsExistingTaskException;
 import task.NotFoundException;
@@ -13,8 +14,8 @@ import java.util.Optional;
 
 public class TaskHandlers extends BaseTaskHandlers {
 
-    public TaskHandlers(TaskManager taskManager, String basePath) {
-        super(taskManager, basePath);
+    public TaskHandlers(Gson gson, TaskManager taskManager, String basePath) {
+        super(gson, taskManager, basePath);
     }
 
     @Override
