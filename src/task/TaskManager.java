@@ -18,11 +18,11 @@ public interface TaskManager {
 
     void clearEpics();
 
-    Task getTaskById(int id);
+    Task getTaskById(int id) throws NotFoundException;
 
-    SubTask getSubTaskById(int id);
+    SubTask getSubTaskById(int id) throws NotFoundException;
 
-    Epic getEpicById(int id);
+    Epic getEpicById(int id) throws NotFoundException;
 
     int createTask(Task task) throws IntersectsExistingTaskException;
 

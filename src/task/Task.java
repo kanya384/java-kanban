@@ -64,7 +64,7 @@ public class Task implements Comparable<Task> {
         this.id = id;
     }
 
-    protected void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

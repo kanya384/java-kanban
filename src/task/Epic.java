@@ -2,11 +2,11 @@ package task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private final ArrayList<Integer> subTaskIds;
+    private List<Integer> subTaskIds;
     private LocalDateTime endTime;
 
     public Epic(String name, String description) {
@@ -34,6 +34,11 @@ public class Epic extends Task {
         if (this.id == id) {
             return;
         }
+
+        if (subTaskIds == null) {
+            subTaskIds = new ArrayList<>();
+        }
+
         subTaskIds.add(id);
     }
 
@@ -53,34 +58,25 @@ public class Epic extends Task {
         this.endTime = endTime;
     }
 
-    protected void setDuration(Duration duration) {
-        this.duration = duration;
+    protected void addDuration(Duration duration) {
+        if (this.duration == null) {
+            this.duration = Duration.ofMinutes(0);
+        }
+        this.duration = this.duration.plus(duration);
     }
+
 
     @Override
     public String toString() {
-        String startTimeString = "";
-        String endTimeString = "";
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
-
-        if (startTime != null) {
-            startTimeString = startTime.format(dateTimeFormatter);
-        }
-
-        if (endTime != null) {
-            endTimeString = endTime.format(dateTimeFormatter);
-        }
-
         return "Epic{" +
-                "id=" + id +
-                ", subTaskIds.length=" + subTaskIds.size() +
+                "subTaskIds=" + subTaskIds +
+                ", endTime=" + endTime +
+                ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
-                ", start_time=" + startTimeString +
-                ", duration=" + duration.toMinutes() + "мин." +
-                ", end_time=" + endTimeString +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
                 '}';
     }
 }
